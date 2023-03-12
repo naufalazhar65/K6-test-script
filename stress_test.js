@@ -36,7 +36,7 @@ export default function () {
     const urlPost = 'https://reqres.in/api/users';
     const payload = JSON.stringify({
         name: 'morpheus',
-        job: 'leader',
+        job: 'leaderr',
     })
 
     const params = {
