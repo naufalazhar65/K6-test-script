@@ -1,43 +1,48 @@
-// POST METHOD
+import http from 'k6/http';
+import { sleep, check } from 'k6';
 
-import http from "k6/http";
-import { check } from "k6";
+export let options = {
+  vus: 1, // Virtual user (VU) yang digunakan dalam pengujian
+  iterations: 1, // Jumlah iterasi pengujian
 
-export const options = {
-    vus: 100,
-    duration: '10s',
-
-    thresholds: {
-      http_req_duration: ['p(99)<1500'], // 99% of requests must complete below 1.5s
-      http_req_failed: ['rate<0.01'], // http errors should be less than 1%
-    },
+  thresholds: {
+    http_req_duration: ['p(95)<500'], // ambang batas waktu respon
+    http_req_failed: ['rate<0.1'], // ambang batas kegagalan permintaan
+  },
 };
 
+
 export default function () {
-  let url = "https://reqres.in/api/login";
-  let payload = JSON.stringify({
-    email: "eve.holt@reqres.in",
-    password: "cityslicka",
+  // GET Request
+  let res1 = http.get('https://reqres.in/api/users?page=2');
+
+  check(res1, {
+    'status is 200': (r) => r.status === 200,
+    'has 6 users': (r) => JSON.parse(r.body).data.length === 6,
   });
+
+  sleep(1);
+
+  // POST Request
+  let data = JSON.stringify({
+    name: 'John Doe',
+    job: 'Software Engineer',
+  });
+
   let params = {
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
     },
   };
-  let res = http.post(url, payload, params);
-  check(res, {
-    "status is 200": (r) => r.status === 200,
-    "response contains token": (r) => r.json().token !== null,
+
+  let res2 = http.post('https://reqres.in/api/users', data, params);
+
+  check(res2, {
+    'status is 201': (r) => r.status === 201,
+    'has ID and createdAt properties': (r) =>
+      JSON.parse(r.body).hasOwnProperty('id') &&
+      JSON.parse(r.body).hasOwnProperty('createdAt'),
   });
+
+  sleep(1);
 }
-
-export default function () {
-  let url = "https://reqres.in/api/users?page=2";
-  let res = http.get(url);
-  check(res, {
-    "status is 200": (r) => r.status === 200,
-    "response contains users": (r) => r.json().data.length > 0,
-  });
-}
-
-
