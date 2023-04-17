@@ -23,7 +23,7 @@ export default function () {
 
   // POST /api/users with JSON data
   let data = JSON.stringify({
-    name: "John Doe",
+    name: "Naufal",
     job: "Software Engineer",
   });
   let res2 = http.post("https://reqres.in/api/users", data, {

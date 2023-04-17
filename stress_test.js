@@ -26,7 +26,7 @@ export default function () {
 
   // POST Request
   let data = JSON.stringify({
-    name: 'John Doe',
+    name: 'Naufal',
     job: 'Software Engineer',
   });
 
